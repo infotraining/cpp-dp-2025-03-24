@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <array>
+#include <functional>
 #include <iomanip>
 #include <iostream>
 #include <memory>
@@ -67,7 +68,7 @@ namespace Inheritance
     };
 } // namespace Inheritance
 
-namespace Delegation
+namespace DelegationCanonical
 {
     class TextAlignment
     {
@@ -135,7 +136,63 @@ namespace Delegation
             std::cout << "[" << alignment_->aligned_text(text_, line_width) << "]\n";
         }
     };
-} // namespace Delegation
+} // namespace DelegationCanonical
+
+namespace DelegationModern
+{
+    using TextAlignment = std::function<std::string(const std::string&, size_t)>;
+
+    class LeftAlignment
+    {
+    public:
+        std::string operator()(const std::string& text, size_t line_width) const
+        {
+            std::stringstream out_str;
+            out_str << text << std::setw(line_width - text.length()) << std::right << "";
+            return out_str.str();
+        }
+    };
+
+    std::string center_alignment(const std::string& text, size_t line_width)
+    {
+        std::stringstream out_str;
+        auto pad_left = (line_width - text.length()) / 2;
+        auto pad_right = line_width - text.length() - pad_left;
+        out_str << std::setw(pad_left) << "" << text << std::setw(pad_right) << "";
+        return out_str.str();
+    }
+
+    auto right_alignment = [](const std::string& text, size_t line_width) {
+        std::stringstream out_str;
+        out_str << std::setw(line_width) << std::right << text;
+        return out_str.str();
+    };
+
+    class TextParagraph
+    {
+        std::string text_;
+        Color color_;
+        TextAlignment alignment_;
+
+    public:
+        TextParagraph(std::string text, Color color, TextAlignment alignment = LeftAlignment{})
+            : text_(std::move(text))
+            , color_(std::move(color))
+            , alignment_{alignment}
+        {
+        }
+
+        void set_alignment(TextAlignment alignment)
+        {
+            alignment_ = alignment;
+        }
+
+        void render(size_t line_width) const
+        {
+            std::cout << "[" << alignment_(text_, line_width) << "]\n";
+        }
+    };
+} // namespace DelegationModern
 
 void use_inheritance()
 {
@@ -152,15 +209,15 @@ void use_inheritance()
 
 void use_delegation()
 {
-    using namespace Delegation;
-    
+    using namespace DelegationModern;
+
     TextParagraph text{"This is sample of text...", Color{0, 0, 0}};
     text.render(80);
 
-    text.set_alignment(std::make_unique<RightAlignment>());
+    text.set_alignment(right_alignment);
     text.render(80);
 
-    text.set_alignment(std::make_unique<CenterAlignment>());
+    text.set_alignment(&center_alignment);
     text.render(80);
 }
 

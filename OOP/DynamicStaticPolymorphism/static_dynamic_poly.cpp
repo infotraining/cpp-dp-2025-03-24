@@ -77,6 +77,12 @@ namespace DynamicPolymorphism
 
 namespace StaticPolymorphism
 {
+    template <typename T>
+    concept Formatter = requires(T formatter, const std::string& message)
+    {
+        { formatter.format(message) } -> std::same_as<std::string>;
+    };
+
     struct UpperCaseFormatter
     {
         std::string format(const std::string& message) const
@@ -88,6 +94,8 @@ namespace StaticPolymorphism
         }
     };
 
+    static_assert(Formatter<UpperCaseFormatter>);
+
     struct CapitalizeFormatter
     {
         std::string format(const std::string& message) const
@@ -98,7 +106,9 @@ namespace StaticPolymorphism
         }
     };
 
-    template <typename TFormatter = UpperCaseFormatter>
+    static_assert(Formatter<CapitalizeFormatter>);
+
+    template <Formatter TFormatter = UpperCaseFormatter>
     class Logger
     {
         TFormatter formatter_;
@@ -136,12 +146,56 @@ void static_polymorphism()
 {
     using namespace StaticPolymorphism;
 
-    Logger logger{UpperCaseFormatter{}};
+    Logger logger{UpperCaseFormatter{}}; // C++17 - CTAD - type deduction
     logger.log("Hello, World!");
 
-    Logger<CapitalizeFormatter> logger2;
+    Logger<CapitalizeFormatter> logger2; // explicit type as template argument
     logger2.log("hello, world!");
+
+    Logger logger3;
+    logger3.log("hello, world!");
 }
+
+class IBase
+{
+public:
+    virtual ~IBase() = default;
+    virtual void print() const = 0;
+};
+
+class Base : public IBase
+{
+    std::string name_;
+protected:
+    std::string name() const
+    {
+        return name_;
+    }
+public:
+    Base(const std::string& name) : name_(name) {}
+    Base(const char* name) : name_(name) {}
+    
+    virtual ~Base() = default;
+
+    virtual void print() const
+    {
+        std::cout << "Base: " << name() << '\n';
+    }
+};
+
+class Derived : public Base // hybrid inheritance - both interface and implementation inheritance
+{
+public:
+    // Derived(const std::string& name) : Base(name) {}
+    // Derived(const char* name) : Base(name) {}
+
+    using Base::Base; // inheriting constructors
+
+    void print() const override
+    {
+        std::cout << "Derived: " << name() << '\n';
+    }
+};
 
 class Container : std::vector<int>
 {
@@ -175,6 +229,9 @@ public:
 
 int main()
 {
+    Derived derived("derived");
+    Base& base = derived;
+
     dynamic_polymorphism();
 
     std::cout << "\n\n";

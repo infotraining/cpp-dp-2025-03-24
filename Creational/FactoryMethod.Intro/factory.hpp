@@ -63,6 +63,26 @@ public:
     }
 };
 
+class AppleMusicService : public MusicService
+{
+    std::string user_name_;
+    std::string secret_;
+    int port_;
+public:
+    AppleMusicService(const std::string& user_name, const std::string& secret, int port = 8099)
+        : user_name_{user_name}
+        , secret_{secret}
+        , port_{port}
+    {
+        std::cout << "Creating AppleMusicService...\n";
+    }
+
+    std::optional<Track> get_track(const std::string& title) override
+    {
+        return Track(title.begin(), title.end());
+    }
+};
+
 // "Creator"
 class MusicServiceCreator
 {
@@ -124,6 +144,25 @@ public:
     std::unique_ptr<MusicService> create_music_service() override
     {
         return std::make_unique<FilesystemMusicService>(path_);
+    }
+};
+
+class AppleMusicServiceCreator : public MusicServiceCreator
+{
+    std::string user_name_;
+    std::string secret_;
+    int port_;
+public:
+    AppleMusicServiceCreator(const std::string& user_name, const std::string& secret, int port = 8099)
+        : user_name_{user_name}
+        , secret_{secret}
+        , port_{port}
+    {
+    }
+
+    std::unique_ptr<MusicService> create_music_service() override
+    {
+        return std::make_unique<AppleMusicService>(user_name_, secret_, port_);
     }
 };
 
