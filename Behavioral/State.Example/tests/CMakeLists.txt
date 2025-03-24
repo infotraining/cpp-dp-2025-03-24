@@ -1,7 +1,7 @@
 set(PROJECT_TEST ${TARGET_MAIN}_tests)
 project(PROJECT_TEST)
 
-find_package(Catch2 3 REQUIRED)
+find_package(Catch2 3)
 
 if (NOT Catch2_FOUND)
   message(STATUS "Catch2 not found, using FetchContent to download it.")
