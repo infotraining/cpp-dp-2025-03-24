@@ -3,7 +3,7 @@ message(STATUS "PROJECT_TESTS is: " ${PROJECT_TESTS})
 
 project(${PROJECT_TESTS} CXX)
 
-find_package(Catch2 3 REQUIRED)
+find_package(Catch2 3)
 
 if (NOT Catch2_FOUND)
   Include(FetchContent)
