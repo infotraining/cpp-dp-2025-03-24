@@ -7,16 +7,8 @@ string(REPLACE " " "_" TARGET_MAIN ${DIRECTORY_NAME})
 #----------------------------------------
 # Boost.DI
 #----------------------------------------
-include(FetchContent)
-FetchContent_Declare(
-  boost_di
-  GIT_REPOSITORY https://github.com/boost-ext/di.git
-  GIT_TAG        v1.3.0
-)
+find_path(BEXT_DI_INCLUDE_DIRS "boost/di.hpp")
 
-FetchContent_GetProperties(boost_di)
-
-#----------------------------------------
 # Library - src
 #----------------------------------------
 add_subdirectory(src)
@@ -38,7 +30,6 @@ target_link_libraries(${TARGET_MAIN} PUBLIC ${PROJECT_LIB})
 #----------------------------------------
 # Boost DI - includes
 #----------------------------------------
-find_path(BEXT_DI_INCLUDE_DIRS "boost/di.hpp")
 target_include_directories(${TARGET_MAIN} PRIVATE ${BEXT_DI_INCLUDE_DIRS}) 
 
 
