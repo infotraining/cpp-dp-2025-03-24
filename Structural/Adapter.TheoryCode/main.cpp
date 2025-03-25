@@ -23,7 +23,7 @@ int main()
     cout << endl;
 
     cout << "-- do_operation on ObjectAdapter" << endl;
-    Adaptee adaptee;
+    BetterAdaptee adaptee;
     ObjectAdapter oadapter(adaptee);
     client.do_operation(oadapter);
 }

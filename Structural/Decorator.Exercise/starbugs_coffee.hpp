@@ -77,6 +77,96 @@ public:
     }
 };
 
+class CoffeeDecorator : public Coffee
+{
+    std::shared_ptr<Coffee> coffee_;
+public:
+    CoffeeDecorator(std::shared_ptr<Coffee> c) : coffee_(c)
+    {}
+
+    float get_total_price() const override
+    {
+        return coffee_->get_total_price();
+    }
+    std::string get_description() const override
+    {
+        return coffee_->get_description();
+    }
+    
+    void prepare() override
+    {
+        coffee_->prepare();
+    }
+
+};
+
+class Whipped : public CoffeeDecorator
+{
+public:
+    using CoffeeDecorator::CoffeeDecorator;
+
+    float get_total_price() const override
+    {
+        return CoffeeDecorator::get_total_price() + 2.5;
+    }
+
+    std::string get_description() const override
+    {
+        return CoffeeDecorator::get_description() + " with whipped cream";
+    }
+    
+    void prepare() override
+    {
+        CoffeeDecorator::prepare();
+        std::cout << "Adding whipped cream...\n";
+    }
+};
+
+class Whisky : public CoffeeDecorator
+{
+public:
+    using CoffeeDecorator::CoffeeDecorator;
+
+    float get_total_price() const override
+    {
+        return CoffeeDecorator::get_total_price() + 6.0;
+    }
+
+    std::string get_description() const override
+    {
+        return CoffeeDecorator::get_description() + " with whisky";
+    }
+    
+    void prepare() override
+    {
+        CoffeeDecorator::prepare();
+        std::cout << "Adding whisky...\n";
+    }
+};
+
+class ExtraEspresso : public CoffeeDecorator
+{
+    Espresso espresso_{};
+public:
+    using CoffeeDecorator::CoffeeDecorator;
+
+    float get_total_price() const override
+    {
+        return CoffeeDecorator::get_total_price() + espresso_.get_total_price();
+    }
+
+    std::string get_description() const override
+    {
+        return CoffeeDecorator::get_description() + " with ExtraEspresso";
+    }
+    
+    void prepare() override
+    {
+        CoffeeDecorator::prepare();
+        espresso_.prepare();
+    }
+};
+
 // TO DO: Condiments: Whipped: 2.5$, Whisky: 6.0$, ExtraEspresso: 4.0$
 
 // TO DO: Add CoffeeDecorator and concrete decorators for condiments 

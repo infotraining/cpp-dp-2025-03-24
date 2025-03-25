@@ -15,9 +15,20 @@ public:
 class Adaptee
 {
 public:
-    void specific_request()
+    virtual ~Adaptee() = default;
+
+    virtual void specific_request()
     {
         std::cout << "Called specific_request()" << std::endl;
+    }
+};
+
+class BetterAdaptee : public Adaptee
+{
+public:
+    void specific_request() override
+    {
+        std::cout << "Called BetterAdaptee::specific_request()" << std::endl;
     }
 };
 
@@ -45,7 +56,7 @@ public:
 
     void request() override
     {
-        adaptee_.specific_request();
+        adaptee_.specific_request(); // delegation
     }
 };
 
