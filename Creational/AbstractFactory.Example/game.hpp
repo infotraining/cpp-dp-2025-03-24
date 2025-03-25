@@ -16,13 +16,15 @@ namespace Game
     enum class GameLevel
     {
         easy,
-        die_hard
+        intermediate,
+        die_hard,
+        super_hard
     };
 
     class GameApp
     {
         std::vector<std::unique_ptr<Enemy>> enemies_;
-        std::unique_ptr<AbstractEnemyFactory> enemy_factory_;
+        std::unique_ptr<EnemyFactory> enemy_factory_;
         std::mt19937 rnd_gen_;
 
     public:
@@ -43,8 +45,14 @@ namespace Game
             case GameLevel::easy:
                 enemy_factory_ = std::make_unique<EasyLevelEnemyFactory>();
                 break;
+            case GameLevel::intermediate:
+                enemy_factory_ = std::make_unique<EnemyCloneFactory>(std::make_unique<SillySoldier>(), std::make_unique<SillyMonster>(), std::make_unique<SillySuperMonster>());
+                break;
             case GameLevel::die_hard:
                 enemy_factory_ = std::make_unique<DieHardLevelEnemyFactory>();
+                break;
+            case GameLevel::super_hard:
+                enemy_factory_ = std::make_unique<SuperHardLevelEnemyFactory>();
                 break;
             }
         }

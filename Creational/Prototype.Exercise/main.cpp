@@ -14,7 +14,6 @@ using namespace std;
 using namespace Drawing;
 using namespace Drawing::IO;
 
-// TODO - make this class copyable
 class GraphicsDoc
 {
     vector<unique_ptr<Shape>> shapes_;
@@ -26,6 +25,12 @@ public:
         : shape_factory_{shape_factory}
         , shape_rw_factory_{shape_rw_factory}
     {
+    }
+
+    GraphicsDoc(const GraphicsDoc& source) : shape_factory_{source.shape_factory_}, shape_rw_factory_{source.shape_rw_factory_}
+    {
+        for (const auto& shp : source.shapes_)
+            shapes_.push_back(shp->clone());
     }
 
     void add(unique_ptr<Shape> shp)
@@ -85,15 +90,13 @@ int main()
     cout << "Start..." << endl;
 
     GraphicsDoc doc(SingletonShapeFactory::instance(), SingletonShapeRWFactory::instance());
-
     doc.load("drawing_prototype_exercise.txt");
-
+    
     cout << "\n";
-
     doc.render();
 
-    // TODO: Uncomment this code
-    // GraphicsDoc doc2 = doc;
-
-    // doc2.save("new_drawing.txt");
+    cout << "\n";
+    GraphicsDoc doc2 = doc;
+    doc2.render();
+    doc2.save("new_drawing.txt");
 }

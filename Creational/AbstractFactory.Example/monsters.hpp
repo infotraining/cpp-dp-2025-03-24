@@ -10,7 +10,18 @@ namespace Game
     {
     public:
         virtual void action() = 0;
+        virtual std::unique_ptr<Enemy> clone() const = 0;
         virtual ~Enemy() = default;
+    };
+
+    template <typename TEnemy, typename TBase = Enemy>
+    class CloneableEnemy : public TBase
+    {
+    public: 
+        std::unique_ptr<Enemy> clone() const override
+        {
+            return std::make_unique<TEnemy>(static_cast<const TEnemy&>(*this));
+        }
     };
 
     class Soldier : public Enemy
@@ -25,7 +36,7 @@ namespace Game
     {
     };
 
-    class SillySoldier : public Soldier
+    class SillySoldier : public CloneableEnemy<SillySoldier, Soldier>
     {
     public:
         void action()
@@ -34,7 +45,7 @@ namespace Game
         }
     };
 
-    class SillyMonster : public Monster
+    class SillyMonster : public CloneableEnemy<SillyMonster, Monster>
     {
     public:
         void action() override
@@ -43,7 +54,7 @@ namespace Game
         }
     };
 
-    class SillySuperMonster : public SuperMonster
+    class SillySuperMonster : public CloneableEnemy<SillySuperMonster, SuperMonster>
     {
     public:
         void action() override
@@ -52,7 +63,7 @@ namespace Game
         }
     };
 
-    class BadSoldier : public Soldier
+    class BadSoldier : public CloneableEnemy<BadSoldier, Soldier>
     {
     public:
         void action() override
@@ -61,7 +72,7 @@ namespace Game
         }
     };
 
-    class BadMonster : public Monster
+    class BadMonster : public CloneableEnemy<BadMonster, Monster>
     {
     public:
         void action() override
@@ -70,12 +81,39 @@ namespace Game
         }
     };
 
-    class BadSuperMonster : public SuperMonster
+    class BadSuperMonster : public CloneableEnemy<BadSuperMonster, SuperMonster>
     {
     public:
         void action() override
         {
             std::cout << "BadSuperMonster Action" << std::endl;
+        }
+    };
+
+    class SuperBadSoldier : public CloneableEnemy<SuperBadSoldier, Soldier>
+    {
+    public:
+        void action() override
+        {
+            std::cout << "SuperBadSoldier Action" << std::endl;
+        }
+    };
+
+    class SuperBadMonster : public CloneableEnemy<SuperBadMonster, Monster>
+    {   
+    public:
+        void action() override
+        {
+            std::cout << "SuperBadMonster Action" << std::endl;
+        }
+    };
+
+    class SuperBadSuperMonster : public CloneableEnemy<SuperBadSuperMonster, SuperMonster>
+    {
+    public:
+        void action() override
+        {
+            std::cout << "SuperBadSuperMonster Action" << std::endl;
         }
     };
 };

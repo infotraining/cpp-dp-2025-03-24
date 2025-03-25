@@ -16,4 +16,9 @@ int main()
 
     game.select_level(GameLevel::die_hard);    
     game.play();
+
+    cout << "\n\n";
+
+    game.select_level(GameLevel::super_hard);    
+    game.play();
 }
