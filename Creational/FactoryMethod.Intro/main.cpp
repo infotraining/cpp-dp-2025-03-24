@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <vector>
 
+
 namespace StronglyCoupled
 {
     class MusicApp
@@ -126,4 +127,19 @@ int main()
     std::string id_from_config = "AppleMusic";
     MusicApp app(music_service_factory.at(id_from_config));
     app.play("Would?");
+}
+
+void most_frequent_factory_method_is_begin()
+{
+    std::list<int> container = {1, 2, 3, 4};
+
+    for(const auto& item : container)
+    {
+        std::cout << item << "\n";
+    }
+
+    for(auto it = container.begin(); it != container.end(); ++it)
+    {
+        std::cout << *it << "\n";
+    }
 }
