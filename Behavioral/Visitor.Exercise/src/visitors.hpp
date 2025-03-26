@@ -35,9 +35,36 @@ public:
     }
 };
 
-// TODO
-class PrintingVisitor
+
+class PrintingVisitor : public AST::AstVisitor
 {
+    std::string result_{};
+public:
+    void visit(AST::IntNode& node)
+    {
+        result_ = std::to_string(node.value());
+    }
+
+    void visit(AST::AddNode& node)
+    {
+        PrintingVisitor lv, rv;
+        node.left().accept(lv);
+        node.right().accept(rv);
+        result_ = "(" + lv.str() + " + " + rv.str() + ")";
+    }
+
+    void visit(AST::MultiplyNode& node)
+    {
+        PrintingVisitor lv, rv;
+        node.left().accept(lv);
+        node.right().accept(rv);
+        result_ = "(" + lv.str() + " * " + rv.str() + ")";
+    }
+
+    std::string str() const
+    {
+        return result_;
+    }
 };
 
 #endif // VISITORS_HPP
