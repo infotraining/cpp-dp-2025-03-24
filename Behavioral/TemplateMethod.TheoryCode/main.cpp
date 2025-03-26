@@ -15,7 +15,7 @@ int main()
 {
     User user{"Jan Kowalski", "jan.kowalski@email.com", "+48 800-22-33-22"};
 
-    DefaultAuthenticationService sms_auth_service;
+    DefaultAuthenticationServiceWithLogging sms_auth_service;
     login_user(user, sms_auth_service);
 
     std::cout << "\n";

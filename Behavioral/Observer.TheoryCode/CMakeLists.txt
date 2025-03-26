@@ -8,4 +8,8 @@ string(REPLACE " " "_" TARGET_MAIN ${DIRECTORY_NAME})
 aux_source_directory(. SRC_LIST)
 file(GLOB HEADERS_LIST "*.h" "*.hpp")
 
+find_package(Boost REQUIRED)
+
 add_executable(${TARGET_MAIN} ${SRC_LIST} ${HEADERS_LIST})
+
+target_link_libraries(${TARGET_MAIN} PRIVATE Boost::boost)

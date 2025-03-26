@@ -3,8 +3,8 @@
 
 #include <iostream>
 #include <memory>
-#include <string>
 #include <random>
+#include <string>
 
 struct User
 {
@@ -18,6 +18,25 @@ class NotificationService
 public:
     virtual void send(const User& user, const std::string& data) = 0;
     virtual ~NotificationService() = default;
+};
+
+// "Decorator"
+class NotificationWithLogging : public NotificationService
+{
+    std::unique_ptr<NotificationService> notification_service_;
+
+public:
+    explicit NotificationWithLogging(std::unique_ptr<NotificationService> notification_service)
+        : notification_service_{std::move(notification_service)}
+    {
+    }
+
+    void send(const User& user, const std::string& data) override
+    {
+        std::cout << "LOG: Sending notification...\n";
+        notification_service_->send(user, data);
+        std::cout << "LOG: Notification sent!\n";
+    }
 };
 
 class MailerService : public NotificationService
@@ -44,6 +63,7 @@ using Code = std::string;
 class AuthenticationService
 {
 protected:
+    virtual void prompt() { }
     virtual Code generate_secret_code() = 0;
     virtual Code enter_secret_code() = 0;
     virtual void on_success() = 0;
@@ -57,11 +77,13 @@ protected:
 public:
     bool login(const User& user)
     {
+        prompt();
+
         Code code = generate_secret_code();
 
         std::unique_ptr<NotificationService> notification_service = create_notification_service();
         notification_service->send(user, code);
-        
+
         if (enter_secret_code() == code)
         {
             on_success();
@@ -76,6 +98,50 @@ public:
 
     virtual ~AuthenticationService() { }
 };
+
+namespace AlternativeTake
+{
+    class AuthenticationService
+    {
+    private:
+        std::shared_ptr<NotificationService> notification_service_;
+
+    protected:
+        virtual void prompt() { }
+        virtual Code generate_secret_code() = 0;
+        virtual Code enter_secret_code() = 0;
+        virtual void on_success() = 0;
+        virtual void on_failure() = 0;        
+
+    public:
+        AuthenticationService(std::shared_ptr<NotificationService> notification_service)
+            : notification_service_{notification_service}
+        {
+        }
+
+        bool login(const User& user)
+        {
+            prompt();
+
+            Code code = generate_secret_code();
+
+            notification_service_->send(user, code);
+
+            if (enter_secret_code() == code)
+            {
+                on_success();
+                return true;
+            }
+            else
+            {
+                on_failure();
+                return false;
+            }
+        }
+
+        virtual ~AuthenticationService() { }
+    };
+}
 
 // "ConcreteClass"
 class DefaultAuthenticationService : public AuthenticationService
@@ -96,7 +162,7 @@ protected:
         std::cin >> code;
         return code;
     }
-    
+
     void on_success() override
     {
         std::cout << "Access granted!\n";
@@ -108,10 +174,24 @@ protected:
     }
 };
 
+class DefaultAuthenticationServiceWithLogging : public DefaultAuthenticationService
+{
+protected:
+    std::unique_ptr<NotificationService> create_notification_service() const override
+    {
+        return std::make_unique<NotificationWithLogging>(DefaultAuthenticationService::create_notification_service());
+    }
+};
+
 // "ConcreteClass"
 class MailerAuthenticationService : public DefaultAuthenticationService
 {
 protected:
+    void prompt() override
+    {
+        std::cout << "###########################\n";
+    }
+
     std::unique_ptr<NotificationService> create_notification_service() const override
     {
         return std::make_unique<MailerService>();
