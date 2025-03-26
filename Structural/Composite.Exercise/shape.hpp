@@ -8,7 +8,7 @@
 namespace Drawing
 {
     class Shape
-    {
+    {        
     public:
         virtual ~Shape() = default;
         virtual void move(int dx, int dy) = 0;
