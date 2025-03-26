@@ -29,4 +29,10 @@ int main()
     root->remove(leaf);
 
     root->display(1);
+
+    std::cout << "\n\n---------------------\n\n";
+
+    shared_ptr<Component> root_clone = root->clone();
+    root_clone->display(1);
+    
 }

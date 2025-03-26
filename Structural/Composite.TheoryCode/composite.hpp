@@ -21,19 +21,33 @@ public:
 	Component& operator=(const Component&) = default;
     virtual ~Component() = default;
     
+    virtual std::unique_ptr<Component> clone() const = 0;
     virtual void display(int depth) = 0;
+};
+
+template <typename TComponent, typename TBase = Component>
+class CloneableComponent : public TBase
+{
+public:
+    using TBase::TBase;
+
+    std::unique_ptr<Component> clone() const override
+    {
+        return std::make_unique<TComponent>(static_cast<const TComponent&>(*this));
+    }
 };
 
 using ComponentPtr = std::shared_ptr<Component>;
 
 // "Composite"
-class Composite : public Component
+class Composite : public CloneableComponent<Composite>
 {
 private:
     std::list<ComponentPtr> children;
 
+    using Base = CloneableComponent<Composite>;
 public:
-    explicit Composite(const std::string& name) : Component(name)
+    explicit Composite(const std::string& name) : Base(name)
     {
     }
 
@@ -57,10 +71,11 @@ public:
 };
 
 // "Leaf"
-class Leaf : public Component
+class Leaf : public CloneableComponent<Leaf>
 {
+    using Base = CloneableComponent<Leaf>;
 public:
-    explicit Leaf(const std::string& name) : Component(name)
+    explicit Leaf(const std::string& name) : Base(name)
     {
     }
 
